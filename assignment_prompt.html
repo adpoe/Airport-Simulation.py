@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CS 1538: Homework 4</title>
+    <link rel="stylesheet" type="text/css" href="class.css" />
+</head>
+<body>
+<h1>Homework 4</h1>
+
+<h2>Introduction</h2>
+<p>In this assignment, you will implement a simulation of the check‐in process at a fictitious small town airport.  You will design an experiment to run the simulation in order to improve the customers' wait time.  Finally, you will perform some analyses on the results of your experiment and report your findings.</p>
+
+<p>Since this project is a little more involved than the previous assignments, it will be weighted as two assignments instead of one.</p>
+
+
+
+<h2>Simulation Details</h2>
+
+<h3>Background</h3>
+<p>The Falkrinea airport caters to only one airline. The airline offers two types of flight:</p>
+<ol>
+    <li>a regional commuter flight that departs every hour for Eldemar (a neighboring city), on the half hour (12:30pm, 1:30pm, etc.)</li>
+    <li>an "international" flight that departs for Koth, a nearby country, every 6 hours (midnight, 6am, noon, 6pm).</li>
+</ol>
+
+<p>The commuter planes have a capacity of 50 coach passenger seats (no first class).  Because these flights run frequently, passengers cannot reserve seats ahead of time. These flights run more like buses &ndash; if a flight is full, the passenger will go on the next flight.  For this assignment, assume that every passenger travels alone.</p>
+
+<p>The international flight planes have a capacity of 150 coach passenger seats and 50 first class passenger seats. Passengers must purchase their tickets and reserve their seats ahead of time for these. Assume that the chance of filling a first class seat is 80%, and the chance of filling a coach seat is 85%.</p>
+
+<p>For both types of flights, you may assume that the demand is identical for flights at all times of the day.</p>
+
+<p>Suppose that a first class ticket costs $1000; a coach ticket on an international flight costs $500; and a coach ticket on a commuter flight costs $200. Further suppose that it costs the airline $10,000 to operate an international flight and $1000 to operate a commuter flight. The airline pays a check‐in agent $25 per hour. The airline would like to keep the payment for the check‐in agent to be within 5% of the total revenue from the flight tickets.</p>
+
+
+<h3>Arrivals at Airport</h3>
+<p>Suppose that the arrivals of the commuters follow the Poisson process, and has an average arrival rate of 40 people per hour.  The international passengers are supposed to arrive at least 90 minutes before their scheduled flight.  Suppose these passengers follow the normal distribution with mean at 75 minutes, and a variance of 50 minutes<sup>2</sup>.  (Note: if the same arrival time is generated for multiple passengers, their arrival times have to be differentiated &ndash; by mere split seconds if necessary)</p>
+
+<p>Upon arriving at the airport, the passengers first have to go to the check-in counter to print out their boarding passes (this is an old airport, it does not support online check-in) and to check in any bags.  Then they will have to go through security screening.</p>
+
+<p>The number of bags a passenger carries can be determined using a geometric distribution: let a Bernoulli trial with a success bias p% represent the chance of a passenger stopping bringing bags.  Suppose that for commuter passengers, p% = 80% and for international passengers, p% = 60%.</p>
+
+
+
+<h3>Station 1: the check-in counters</h3>
+<p>The airline has the space for up to six check-in counters to which it could assign agents to process the passengers.  The airline currently has one counter designated for the first-class passengers and three counters for other passengers.  When all the agents are busy, the passengers wait in lines.  There are two separate lines: one for first class passengers and one for coach passengers.</p>
+
+<p>One of the objectives for this simulation is to determine an allocation policy for the number of agents to help first-class passengers and the number of agents to help coach passengers.  The airline wants to ensure that the first-class passengers don't have to wait in line for long; it still wants to keep the wait time for coach passengers reasonable &ndash; certainly, it wants to maximize the number of passengers to get to their flights on time.  Finally, it is also in the airline's interest to minimize the agents' idle time.</p>
+
+<p>At the check-in counter, the service time is stochastic, but it is made up of the following components:</p>
+<ul>
+    <li><u>Print boarding pass</u>: exponential with an average service time of 2 minutes</li>
+    <li><u>Check bags</u>: the checking of each bag follows an exponential with an average service time of 1 minute.  If the passenger has no bags, the service time is 0.</li>
+    <li><u>Other problems and delays</u>: exponential with an average service time of 3 minutes</li>
+</ul>
+
+
+
+<h3>Station 2: the security screening</h3>
+<p>At the security screening, there are also two separate waiting lines: one for the first-class passengers and one for the coach passengers.  There is one screening machine dedicated to the first-class passengers and there are two screening machines for coach passengers.  The average service time of each screening machine follows the exponential distribution with an average service time of 3 minutes.</p>
+
+
+
+<h3>Station 3: at the gate</h3>
+<p>Once the passengers move past the security screening, we assume that they arrived at their gate instantaneously.  In other words, if an international passenger leaves the screening area before (or right on) the plane's departure time, he/she is assumed to have made the flight.</p>
+
+<p>If an international passenger is not yet at the gate when his/her flight takes off, then he/she has missed the flight and will then leave the airport.  If the passenger has arrived at the airport at least 90 minutes before the scheduled departure, as recommended, the airline will refund the passenger's ticket price since it's the over-crowded airport that caused the delay.  Otherwise, the passenger gets no refund.  To simplify the problem somewhat, you may assume that the international passengers do not make any logical reasoning &ndash; they will not leave the line minutes before the flight takes off even though their chances of catching the flight is practically hopeless.</p>
+
+<p>The handling of the commuter passengers is a little different, however.  A commuter passenger cannot "miss a flight" in the sense that his/her ticket is not for a particular flight.  So, the gate area is essentially a third waiting queue for the commuter passengers.  They will always wait patiently and hop on the next flight with an available spot.</p>
+
+
+
+
+
+<h2>Program Specifications</h2>
+<p>The main component of your program is to simulate the airport check-in scenario as described above.  You may also need to write some additional program(s) to run the experiment (see below) and perhaps to do some analysis on the outputs.</p>
+
+<p>As with previous assignments, you may develop your program in Java, C, C++, C#, Python, or a language of your choice (pending approval of the TA) and your top-level program should provide some reasonable input prompts for the user (e.g., "How long do you want to run the simulation?"), and the output should be stored and/or displayed in some reasonable way.  To generate random numbers from non-uniform distributions, you may use standard library calls if they are supported.  Otherwise, you may have to implement your own.</p>
+
+<p>You should prepare a README file (separate from the analysis report) for the grader. It should explain how to run your program and provide any other relevant information that might help the grader evaluate your program.</p>
+
+
+
+<h2>Experimental Design</h3>
+<p>In this assignment, your objective in conducting the simulation is to help the airline with the following goals:</p>
+<ol>
+    <li>Maximize profit.</li>
+    <li>Minimize the check-in wait time (especially for first-class passengers)</li>
+    <li>Maximize the likelihood that an international passenger catches the plane; minimize the post-security-screening wait time for commuter passengers</li>
+    <li>Minimize the agents' idle time</li>
+</ol>
+
+<p>Some possible actions that the airline might take include:</p>
+<ol>
+    <li>Reallocation of check-in agents.</li>
+    <li>Increase the number of check-in agents (there are up to six counters)</li>
+    <li>Change the number of commuter flights per day.</li>
+</ol>
+
+<p>Design some experiments to help the airline figure out their best option.  Describe your methodology in the report.  Some things you should keep in mind:</p>
+<ul>
+    <li>You should decide how long to run your simulation for &ndash; should it be one day of airport operation?  One month?  One year?  Longer?  Justify your choice in the report.</li>
+    <li>Recall that the initial events tend to run differently than later events when the system stabilizes (e.g. the check-in counters are not as busy when they open for the first flight of the day).  You should decide for how long you want to run the simulation before you start to gather statistics (such as server utilization, average wait time, etc.)</li>
+    <li>Related to the length of one run of the simulation, you might also consider running multiple trials.  Arguably, the longer each run of the simulation, the fewer trials you need to repeat overall.  Discuss your choice in the report.</li>
+</ul>
+
+
+
+
+<h2>Report</h2>
+<p>Your report should explain your experimental design in detail.  Not only should you be precise about each step you took, you should also clearly point out all of the design choices you've made and give some reasonable justification for your decisions.  You should identify key statistics that you gathered.</p>
+
+<p>After running the experiments, you should present the results in a clear and easy to understand way.  Use tables and graphs as necessary.</p>
+
+<p>Some issues you should think about and address in the report:</p>
+<ul>
+    <li>From your experiments, does it seem like the airline can possibly satisfy all of its goals?  Is so, how robust is this setting?  For example, if the chance that a person wants to go on an international flight in a coach seat increases to 93% or drops to 70%, how should the check-in agent allocation be modified?</li>
+    <li>On the other hand, if none of the actions that are available to the airline can satisfy all of its goals, what other changes might be made?  For example, the airline might want to convince the airport to install more security screening stations.  Or, perhaps the passengers should be required to arrive earlier.  Modify the experiment on the airline's behalf to investigate whether there are feasible alternatives.</li>
+</ul>
+
+<p>Draw some conclusions about what the airline should do.</p>
+
+
+
+
+<h2>Suggested Timetable</h2>
+<ul>
+    <!--<li>assigned: 3/3 (note: spring break is 3/6 - 3/12)</li>-->
+    <li>3/18: Complete the basic functionalities of the simulation program, including debugging.</li>
+    <li>3/20: Complete an initial experimental design.  You may realize that you need to make additional modifications to your simulation program.</li>
+    <li>3/23: Complete a first attempt at the experiment.  Do the results make sense?  If not, you may need to revise your experimental design and/or simulation program some more.</li>
+    <li>3/27: Complete full experiments.  Organize results for the report.</li>
+    <li><b>3/29: Submit assignment.</b></li>
+</ul>
+
+
+<h2>Submission</h2>
+<p>The assignment is due Tuesday, March 29 by 11:59 pm.</p>
+
+<p>Zip your source code files, your write-up, and your README into one zip file and upload it to <a href='http://courseweb.pitt.edu/'>CourseWeb</a>, in the Homework 4 location.</p>
+
+<p>For more advice on submitting your assignment, see the Assignments section of the <a href='tips.html'>Tips for Success</a> page.</p>
+</body>
+</html>
+
